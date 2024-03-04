@@ -10,6 +10,7 @@
 
 #define MAX_BACKLOG 10
 #define BUFF_SIZE 4096
+#define MAX_FILE_BYTES 2048
 #define true 1
 #define false 0
 
@@ -160,14 +161,13 @@ void resSendFile(Request req, char *filepath)
                    "Server: webserver-c\r\n"
                    "Content-type: text/html\r\n\r\n";
     char end[] = "\r\n";
-    // TODO: change from 4096
-    char file_contents[4096];
-    char buffer[1024];
+    char file_contents[BUFF_SIZE];
+    char buffer[MAX_FILE_BYTES];
     strcpy(file_contents, start);
 
     FILE *file = fopen(filepath, "r");
     ASSERT(file != NULL, "Failed to open file!");
-    while (fgets(buffer, 1024, file))
+    while (fgets(buffer, MAX_FILE_BYTES, file))
     {
         strcat(file_contents, buffer);
     }
