@@ -48,6 +48,3 @@ server_t CreateServer(struct server_config conf);
 void ServerListen(server_t *app, int port);
 void ServerRegister(server_t *app, char *path, HTTP_TYPE type, void (*handler)(Request, Response));
 void ServerRun(server_t *app);
-
-void ResSendString(Request req, char *input);
-void ResSendFile(Request req, char *filepath);

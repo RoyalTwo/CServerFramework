@@ -23,6 +23,9 @@ void ASSERT(int condition, char *message)
     }
 }
 
+void resSendString(Request req, char *input);
+void resSendFile(Request req, char *filepath);
+
 server_t CreateServer(struct server_config conf)
 {
     server_t srv = {0};
@@ -106,8 +109,8 @@ void ServerRun(server_t *app)
             strcpy(requestObj.path, path);
 
             Response responseObj;
-            responseObj.sendFile = &ResSendFile;
-            responseObj.sendString = &ResSendString;
+            responseObj.sendFile = &resSendFile;
+            responseObj.sendString = &resSendString;
 
             for (int i = 0; i < app->_get_count; i++)
             {
@@ -130,7 +133,7 @@ void ServerRun(server_t *app)
     }
 }
 
-void ResSendString(Request req, char *input)
+void resSendString(Request req, char *input)
 {
     int clientfd = req._client_fd;
     // TODO: change from 1024
@@ -143,10 +146,14 @@ void ResSendString(Request req, char *input)
     strcat(resp, end);
 
     int bytes_written = write(clientfd, resp, strlen(resp));
+    while (bytes_written != strlen(resp))
+    {
+        bytes_written = write(clientfd, resp, strlen(resp));
+    }
     close(clientfd);
 }
 
-void ResSendFile(Request req, char *filepath)
+void resSendFile(Request req, char *filepath)
 {
     int clientfd = req._client_fd;
     // TODO: Create http headers more dynamically
