@@ -6,13 +6,13 @@ void get_not_found(Request req)
     printf("Page not found!\n");
 }
 
-void get_root(Request req)
+void get_root(Request req, Response res)
 {
     printf("Root page!!\n");
-    ResSendFile(req, "example/example.html");
+    res.sendFile(req, "example/example.html");
 }
 
-void get_help(Request req)
+void get_help(Request req, Response res)
 {
     printf("Help page!!!\n");
 }

@@ -23,6 +23,9 @@ void ASSERT(int condition, char *message)
     }
 }
 
+void resSendString(Request req, char *input);
+void resSendFile(Request req, char *filepath);
+
 server_t CreateServer(struct server_config conf)
 {
     server_t srv = {0};
@@ -56,7 +59,7 @@ void ServerListen(server_t *app, int port)
     app->_addr = server_addr;
 }
 
-void ServerRegister(server_t *app, char *path, HTTP_TYPE type, void (*handler)(Request))
+void ServerRegister(server_t *app, char *path, HTTP_TYPE type, void (*handler)(Request, Response))
 {
     if (type == HTTP_GET)
     {
@@ -105,11 +108,15 @@ void ServerRun(server_t *app)
             requestObj._client_fd = client_fd;
             strcpy(requestObj.path, path);
 
+            Response responseObj;
+            responseObj.sendFile = &resSendFile;
+            responseObj.sendString = &resSendString;
+
             for (int i = 0; i < app->_get_count; i++)
             {
                 if (strcmp(app->_get_handlers[i].path, path) == 0)
                 {
-                    app->_get_handlers[i].func(requestObj);
+                    app->_get_handlers[i].func(requestObj, responseObj);
                     found = true;
                     break;
                 }
@@ -126,7 +133,7 @@ void ServerRun(server_t *app)
     }
 }
 
-void ResSendString(Request req, char *input)
+void resSendString(Request req, char *input)
 {
     int clientfd = req._client_fd;
     // TODO: change from 1024
@@ -139,12 +146,17 @@ void ResSendString(Request req, char *input)
     strcat(resp, end);
 
     int bytes_written = write(clientfd, resp, strlen(resp));
+    while (bytes_written != strlen(resp))
+    {
+        bytes_written = write(clientfd, resp, strlen(resp));
+    }
     close(clientfd);
 }
 
-void ResSendFile(Request req, char *filepath)
+void resSendFile(Request req, char *filepath)
 {
     int clientfd = req._client_fd;
+    // TODO: Create http headers more dynamically
     char start[] = "HTTP/1.0 200 OK\r\n"
                    "Server: webserver-c\r\n"
                    "Content-type: text/html\r\n\r\n";
@@ -162,6 +174,10 @@ void ResSendFile(Request req, char *filepath)
     }
     strcat(file_contents, end);
 
-    write(clientfd, file_contents, strlen(file_contents));
+    int bytes_written = write(clientfd, file_contents, strlen(file_contents));
+    while (bytes_written != strlen(file_contents))
+    {
+        bytes_written = write(clientfd, file_contents, strlen(file_contents));
+    }
     shutdown(clientfd, SHUT_RDWR);
 }

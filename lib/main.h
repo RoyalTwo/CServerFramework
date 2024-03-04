@@ -11,11 +11,15 @@ typedef struct
 
 typedef struct
 {
+    void (*sendFile)(Request, char *);
+    void (*sendString)(Request, char *);
 } Response;
+
+// Response should have sendFile() and sendString()
 
 struct get_handler
 {
-    void (*func)(Request);
+    void (*func)(Request, Response);
     // TODO: change from 256
     char path[256];
 };
@@ -42,8 +46,5 @@ typedef enum
 
 server_t CreateServer(struct server_config conf);
 void ServerListen(server_t *app, int port);
-void ServerRegister(server_t *app, char *path, HTTP_TYPE type, void (*handler)(Request));
+void ServerRegister(server_t *app, char *path, HTTP_TYPE type, void (*handler)(Request, Response));
 void ServerRun(server_t *app);
-
-void ResSendString(Request req, char *input);
-void ResSendFile(Request req, char *filepath);
