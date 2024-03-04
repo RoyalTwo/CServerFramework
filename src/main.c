@@ -8,7 +8,6 @@
 #include <ctype.h>
 #include "main.h"
 
-#define PORT 3444
 #define MAX_BACKLOG 10
 #define BUFF_SIZE 4096
 #define true 1
