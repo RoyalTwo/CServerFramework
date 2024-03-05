@@ -6,10 +6,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <regex.h>
 #include "server.h"
 
 #define MAX_BACKLOG 10
 #define BUFF_SIZE 4096
+#define PATH_SIZE 256
 #define MAX_FILE_BYTES 2048
 #define true 1
 #define false 0
@@ -71,6 +73,17 @@ void ServerRegister(server_t *app, char *path, HTTP_TYPE type, void (*handler)(R
     }
 }
 
+HTTP_TYPE str_to_http_type(char *input)
+{
+    HTTP_TYPE req_type = HTTP_NONE;
+    // strcmp() returns 0 if matched
+    if (!strcmp(input, "GET"))
+        req_type = HTTP_GET;
+    if (!strcmp(input, "POST"))
+        req_type = HTTP_POST;
+    return req_type;
+}
+
 void ServerRun(server_t *app)
 {
     while (1)
@@ -82,16 +95,37 @@ void ServerRun(server_t *app)
         ASSERT(client_fd != -1, "Failed to accept client!");
 
         char buffer[BUFF_SIZE] = {0};
+        // TODO: Make sure bytes_read is correct
         int bytes_read = read(client_fd, buffer, BUFF_SIZE - 1);
-        // 4 for GET, POST, HEAD
-        char req[5];
-        req[4] = '\0';
-        strncpy(req, buffer, 4);
+
+        // 10 characters just in case
+        char first_chars[10] = {0};
+        strncpy(first_chars, buffer, 4);
+        first_chars[9] = '\0';
+
+        // Probably not the best way to do this
+        char *http_req_types[] = {"GET", "POST"};
+        int http_req_nums = 2;
+
+        regex_t regex;
+        int result_found = false;
+        HTTP_TYPE req_type = HTTP_NONE;
+        for (int i = 0; i < http_req_nums; i++)
+        {
+            int comp_result = regcomp(&regex, http_req_types[i], 0);
+            ASSERT(comp_result == 0, "Regex compilation failed!");
+            result_found = regexec(&regex, first_chars, 0, NULL, 0);
+            // regexec() returns 0 if matched
+            if (result_found)
+                continue;
+            req_type = str_to_http_type(http_req_types[i]);
+        }
+
         // TODO: change from 256
-        char path[256] = {0};
+        char path[PATH_SIZE] = {0};
         // This is horrible spaghetti code, I should use regex
         // TODO: improve please :C
-        for (int i = 0; i < 256; i++)
+        for (int i = 0; i < PATH_SIZE; i++)
         {
             if (isspace(buffer[i + 4]) != 0)
             {
@@ -101,7 +135,7 @@ void ServerRun(server_t *app)
             path[i] = buffer[i + 4];
         }
 
-        if (strcmp(req, "GET ") == 0)
+        if (req_type == HTTP_GET)
         {
             int found = false;
             Request requestObj;
@@ -126,7 +160,7 @@ void ServerRun(server_t *app)
                 app->config.not_found_handler(requestObj);
             }
         }
-        if (strcmp(req, "POST") == 0)
+        if (req_type == HTTP_POST)
         {
             printf("POST REQUEST\n");
         }

@@ -41,7 +41,8 @@ typedef struct
 typedef enum
 {
     HTTP_GET,
-    HTTP_POST
+    HTTP_POST,
+    HTTP_NONE
 } HTTP_TYPE;
 
 server_t CreateServer(struct server_config conf);
