@@ -88,6 +88,7 @@ void ServerRun(server_t *app)
 {
     while (1)
     {
+        /* -- Accept Connection -- */
         struct sockaddr_in client_addr;
         socklen_t client_addr_size = sizeof(client_addr);
         // Accept is blocking until it gets a connection
@@ -98,6 +99,7 @@ void ServerRun(server_t *app)
         // TODO: Make sure bytes_read is correct
         int bytes_read = read(client_fd, buffer, BUFF_SIZE - 1);
 
+        /* -- Read HTTP Type -- */
         // 10 characters just in case
         char first_chars[10] = {0};
         strncpy(first_chars, buffer, 4);
@@ -121,6 +123,7 @@ void ServerRun(server_t *app)
             req_type = str_to_http_type(http_req_types[i]);
         }
 
+        /* -- Read URL Path -- */
         // Again, probably not the best way to do this
         char path[PATH_SIZE] = {0};
         char *start_ptr = strchr(buffer, '/');
@@ -135,6 +138,7 @@ void ServerRun(server_t *app)
             path[i] = '\0';
         }
 
+        /* -- Route Request -- */
         if (req_type == HTTP_GET)
         {
             int found = false;
