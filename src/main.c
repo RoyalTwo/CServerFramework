@@ -121,18 +121,18 @@ void ServerRun(server_t *app)
             req_type = str_to_http_type(http_req_types[i]);
         }
 
-        // TODO: change from 256
+        // Again, probably not the best way to do this
         char path[PATH_SIZE] = {0};
-        // This is horrible spaghetti code, I should use regex
-        // TODO: improve please :C
-        for (int i = 0; i < PATH_SIZE; i++)
+        char *start_ptr = strchr(buffer, '/');
+        int start_idx = start_ptr - buffer;
         {
-            if (isspace(buffer[i + 4]) != 0)
+            int i = 0;
+            while (!isspace(buffer[start_idx + i]))
             {
-                path[i] = '\0';
-                break;
+                path[i] = buffer[start_idx + i];
+                i++;
             }
-            path[i] = buffer[i + 4];
+            path[i] = '\0';
         }
 
         if (req_type == HTTP_GET)
