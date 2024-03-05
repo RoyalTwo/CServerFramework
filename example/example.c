@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "main.h"
+#include "server.h"
 
 void get_not_found(Request req)
 {

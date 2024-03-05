@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#include "main.h"
+#include "server.h"
 
 #define MAX_BACKLOG 10
 #define BUFF_SIZE 4096

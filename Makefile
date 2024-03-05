@@ -3,6 +3,8 @@ SRC_DIR := src
 COMPILER := clang
 LIB_DIR := lib
 
+build: 
+
 run-example: $(SRC_DIR)/example.out
 	./$(BIN_DIR)/example.out
 
