@@ -6,6 +6,7 @@ LIB_DIR := lib
 build: 
 	$(COMPILER) -c $(SRC_DIR)/main.c -I$(LIB_DIR)/ -o $(BIN_DIR)/objs/main.o
 	ar rcs $(BIN_DIR)/libserver.a $(BIN_DIR)/objs/main.o
+	cp $(LIB_DIR)/server.h $(BIN_DIR)/
 
 run-example: $(SRC_DIR)/example.out
 	./example/example.out
