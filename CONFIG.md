@@ -1,4 +1,4 @@
-# Config Options
+## Config Options
 
 ### These are fields on the server_config struct
 
