@@ -44,7 +44,7 @@ To allow the library to be used:
 
 ### Usage
 
-This library is designed to be used in a similar way to ExpresJS. That means HTTP requests are handled by registering and passing a handler function callback. These callback functions take in two arguments, a Request object and a Response object.
+This library is designed to be used in a similar way to ExpressJS. That means HTTP requests are handled by registering and passing a handler function callback. These callback functions take in two arguments, a Request object and a Response object.
 
 Below is an example of a simple web server that handles a GET request to the root domain. There is also an example/ folder that showcases every feature.
 
